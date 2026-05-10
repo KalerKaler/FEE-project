@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fCC</title>
+    <style>
+        body {
+          background: #742929;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+        }
+
+        #lyrics{
+          align-items: right;
+        }
+
+        #player{
+          align-items: left;
+          display: block;
+        }
+
+        .playerBox{
+          padding : 3rem;
+          align-items: left;
+          left: 2vw;
+        }
+    </style>
+  </head>
+  <body>
+
+    <div class="playerBox">
+      <input type="file" id = "file">
+      <audio id = "audio" controls></audio>
+    </div>
+    
+
+    <am-lyrics
+    song-title=""
+    song-artist="Mark Ronson"
+    song-duration="269000"
+    current-time="0"
+    duration=""
+    highlight-color="#f00"
+    font-family="'Inter', Arial, sans-serif"
+    autoscroll
+    interpolate
+    id = lyrics
+    ></am-lyrics>
+
+
+    <script type="module">
+      import 'https://cdn.jsdelivr.net/npm/@uimaxbai/am-lyrics/dist/src/am-lyrics.min.js';
+
+      const inputFile = document.getElementById("file");
+      const player = document.getElementById("audio");
+      const lrc = document.getElementById("lyrics");
+
+      // This function runs every single frame (~60 times per second)
+      function syncLyrics() {
+        if (!player.paused) {
+          // Update the component with high precision
+          lrc.currentTime = player.currentTime * 1000;
+        }
+        // Keep the loop going
+        requestAnimationFrame(syncLyrics);
+      }
+
+      // Start the loop
+      requestAnimationFrame(syncLyrics);
+
+      inputFile.addEventListener("change", function(f) {
+        const file = f.target.files[0];
+        if (!file) return;
+
+        const songURL = URL.createObjectURL(file);
+        player.src = songURL;
+        player.play();
+        const [title, artist] = file.name.replace(/\.[^/.]+$/, "").split("-");
+        lrc.setAttribute("song-title", title);
+        lrc.setAttribute("song-artist", artist);
+        
+        player.onloadedmetadata = () => {
+          lrc.setAttribute("song-duration", (player.duration * 1000).toString());
+        };
+      });
+
+    </script>
+  </body>
+</html>
