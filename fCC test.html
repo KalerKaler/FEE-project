@@ -13,13 +13,14 @@
           align-items: center;
           justify-content: center;
           height: 100vh;
+          gap: 15rem;
         }
 
         #lyrics{
           align-items: right;
           display: none ;
-          --am-lyrics-highlight-color: rgba(10, 50, 70);
-          --highlight-color: grey;
+          --am-lyrics-highlight-color: pink;
+          --highlight-color: gold;
         }
 
         #player{
@@ -33,18 +34,35 @@
           left: 2vw;
           display: flex;
           flex-direction: column;
-          gap: 15rem;
+          gap: 5rem;
+          background-color: rgba(10, 10, 10, 0.2);
+          max-height: 80vh;
+          border-radius: 6%;
         }
 
         #coverImg{
           display: none;
           width: 300px;
           height: 300px;
-          border-radius: 10%;;
+          border-radius: 10%;
+          align-items: center;
+          align-self: center;
         }
 
         #anotherSong{
           display: none;
+          color: lightgreen;
+          background-color: darkorchid;
+        }
+
+        #anotherSong:hover, #file:hover{
+          cursor: pointer;
+        }
+
+        #songName{
+          color: hotpink;
+          display: none;
+          text-align: center;
         }
     </style>
   </head>
@@ -53,6 +71,7 @@
     <div class="playerBox">
       <img id="coverImg" >
       <input type="file" id = "file">
+      <h1 id="songName"></h1>
       <audio id = "audio" controls></audio>
       <button id="anotherSong">Select a different song</button>
     </div>
@@ -61,7 +80,7 @@
     <am-lyrics
     song-title=""
     song-artist=""
-    song-duration="269000"
+    song-duration=""
     current-time="0"
     duration=""
     highlight-color="#f00"
@@ -80,6 +99,7 @@
       const lyrics = document.getElementById("lyrics");
       const cover = document.getElementById("coverImg");
       const anotherSong = document.getElementById("anotherSong");
+      const songName = document.getElementById("songName");
 
       function syncLyrics() {
         if (!player.paused) {
@@ -98,6 +118,7 @@
         cover.style.display = 'block';
         lyrics.style.display = 'block';
         anotherSong.style.display = 'block';
+        songName.style.display = 'block';
 
         const songURL = URL.createObjectURL(file);
         player.src = songURL;
@@ -115,9 +136,12 @@
             const blob = new Blob([imageData], {type: image.format});
             const url = URL.createObjectURL(blob);
 
+            songName.innerHTML = `${title} <br> ${artist}`;
             lyrics.setAttribute("song-title", title);
             lyrics.setAttribute("song-artist", artist);
             lyrics.setAttribute("song-album", album);
+            console.log(lyrics.songDuration.value);
+            console.log(player.duration * 1000);
             cover.src = url;
             
           }
@@ -135,6 +159,7 @@
         anotherSong.addEventListener('click', () => {
           inputFile.style.display = 'block';
         cover.style.display = 'none';
+        songName.style.display = 'none';
         lyrics.style.display = 'none';
         anotherSong.style.display = 'none';
         player.src = "";
