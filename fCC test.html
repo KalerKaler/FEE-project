@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>fCC</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
     <style>
         body {
           background: #742929;
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           align-items: center;
           justify-content: center;
           height: 100vh;
@@ -16,6 +17,9 @@
 
         #lyrics{
           align-items: right;
+          display: none ;
+          --am-lyrics-highlight-color: rgba(10, 50, 70);
+          --highlight-color: grey;
         }
 
         #player{
@@ -27,20 +31,36 @@
           padding : 3rem;
           align-items: left;
           left: 2vw;
+          display: flex;
+          flex-direction: column;
+          gap: 15rem;
+        }
+
+        #coverImg{
+          display: none;
+          width: 300px;
+          height: 300px;
+          border-radius: 10%;;
+        }
+
+        #anotherSong{
+          display: none;
         }
     </style>
   </head>
   <body>
 
     <div class="playerBox">
+      <img id="coverImg" >
       <input type="file" id = "file">
       <audio id = "audio" controls></audio>
+      <button id="anotherSong">Select a different song</button>
     </div>
     
 
     <am-lyrics
     song-title=""
-    song-artist="Mark Ronson"
+    song-artist=""
     song-duration="269000"
     current-time="0"
     duration=""
@@ -48,7 +68,7 @@
     font-family="'Inter', Arial, sans-serif"
     autoscroll
     interpolate
-    id = lyrics
+    id = "lyrics"
     ></am-lyrics>
 
 
@@ -57,35 +77,69 @@
 
       const inputFile = document.getElementById("file");
       const player = document.getElementById("audio");
-      const lrc = document.getElementById("lyrics");
+      const lyrics = document.getElementById("lyrics");
+      const cover = document.getElementById("coverImg");
+      const anotherSong = document.getElementById("anotherSong");
 
-      // This function runs every single frame (~60 times per second)
       function syncLyrics() {
         if (!player.paused) {
-          // Update the component with high precision
-          lrc.currentTime = player.currentTime * 1000;
+          lyrics.currentTime = player.currentTime * 1000;
         }
-        // Keep the loop going
         requestAnimationFrame(syncLyrics);
       }
 
-      // Start the loop
       requestAnimationFrame(syncLyrics);
 
       inputFile.addEventListener("change", function(f) {
         const file = f.target.files[0];
         if (!file) return;
 
+        inputFile.style.display = 'none';
+        cover.style.display = 'block';
+        lyrics.style.display = 'block';
+        anotherSong.style.display = 'block';
+
         const songURL = URL.createObjectURL(file);
         player.src = songURL;
         player.play();
-        const [title, artist] = file.name.replace(/\.[^/.]+$/, "").split("-");
-        lrc.setAttribute("song-title", title);
-        lrc.setAttribute("song-artist", artist);
+
+        window.jsmediatags.read(file, {
+          onSuccess: function(tag) {
+            const tags = tag.tags;
+
+            const title = tags.title || file.name.replace(/\.[^/.]+$/, "");
+            const artist = tags.artist || "Unknown Artist";
+            const album = tags.album || "Unknown Album";
+            const image = tags.picture;
+            const imageData = new Uint8Array(image.data);
+            const blob = new Blob([imageData], {type: image.format});
+            const url = URL.createObjectURL(blob);
+
+            lyrics.setAttribute("song-title", title);
+            lyrics.setAttribute("song-artist", artist);
+            lyrics.setAttribute("song-album", album);
+            cover.src = url;
+            
+          }
+        })
         
         player.onloadedmetadata = () => {
-          lrc.setAttribute("song-duration", (player.duration * 1000).toString());
+          lyrics.setAttribute("song-duration", (player.duration * 1000).toString());
         };
+
+        lyrics.addEventListener('line-click', event => {
+          player.currentTime = event.detail.timestamp / 1000;
+          console.log('Seek to:', event.detail.timestamp); // timestamp in milliseconds
+        });
+
+        anotherSong.addEventListener('click', () => {
+          inputFile.style.display = 'block';
+        cover.style.display = 'none';
+        lyrics.style.display = 'none';
+        anotherSong.style.display = 'none';
+        player.src = "";
+        player.pause();
+        })
       });
 
     </script>
