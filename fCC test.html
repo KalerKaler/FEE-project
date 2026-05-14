@@ -133,6 +133,7 @@
             const album = tags.album || "Unknown Album";
             const image = tags.picture;
             
+            document.title = `${title} - ${artist}`;
             songName.innerHTML = `${title} <br> ${artist}`;
             lyrics.setAttribute("song-title", title);
             lyrics.setAttribute("song-artist", artist);
