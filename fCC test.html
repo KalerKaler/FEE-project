@@ -132,17 +132,20 @@
             const artist = tags.artist || "Unknown Artist";
             const album = tags.album || "Unknown Album";
             const image = tags.picture;
-            const imageData = new Uint8Array(image.data);
-            const blob = new Blob([imageData], {type: image.format});
-            const url = URL.createObjectURL(blob);
-
+            
             songName.innerHTML = `${title} <br> ${artist}`;
             lyrics.setAttribute("song-title", title);
             lyrics.setAttribute("song-artist", artist);
             lyrics.setAttribute("song-album", album);
-            console.log(lyrics.songDuration.value);
-            console.log(player.duration * 1000);
-            cover.src = url;
+
+            if (image){
+              const imageData = new Uint8Array(image.data);
+              const blob = new Blob([imageData], {type: image.format});
+              const url = URL.createObjectURL(blob);
+              cover.src = url;
+            }else{
+              cover.src="defaultFallbackCover.jpg";
+            }
             
           }
         })
