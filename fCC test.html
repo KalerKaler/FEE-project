@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fCC</title>
+    <title>Music Player</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
     <style>
         body {
@@ -41,7 +41,6 @@
         }
 
         #coverImg{
-          display: none;
           width: 300px;
           height: 300px;
           border-radius: 10%;
@@ -69,7 +68,7 @@
   <body>
 
     <div class="playerBox">
-      <img id="coverImg" >
+      <img id="coverImg" src="defaultFallbackCover.jpg">
       <input type="file" id = "file">
       <h1 id="songName"></h1>
       <audio id = "audio" controls></audio>
@@ -162,12 +161,13 @@
 
         anotherSong.addEventListener('click', () => {
           inputFile.style.display = 'block';
-        cover.style.display = 'none';
-        songName.style.display = 'none';
-        lyrics.style.display = 'none';
-        anotherSong.style.display = 'none';
-        player.src = "";
-        player.pause();
+          cover.src = "defaultFallbackCover.jpg";
+          songName.style.display = 'none';
+          lyrics.style.display = 'none';
+          anotherSong.style.display = 'none';
+          document.title = "Music Player";
+          player.src = "";
+          player.pause();
         })
       });
 
